@@ -5,6 +5,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
     "db-sync": "npx prisma migrate dev",
     "type-check": "tsc"
   },
@@ -15,6 +16,8 @@
     "@types/react": "18.0.34",
     "@types/react-dom": "18.0.11",
     "autoprefixer": "10.4.14",
+    "eslint": "^8.38.0",
+    "eslint-config-next": "^13.3.0",
     "iron-session": "^6.3.1",
     "next": "13.3.0",
     "postcss": "8.4.21",
@@ -25,9 +28,14 @@
     "swr": "2.1.3",
     "tailwindcss": "3.3.1",
     "ts-node": "10.9.1",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "yup": "^1.0.2"
   },
   "license": "ISC",
   "keywords": [],
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0"
+  }
 }

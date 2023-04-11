@@ -1,42 +1,55 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import createHttpError from 'http-errors';
+import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
-type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+import globalErrorHandler from './globalErrorHandler';
 
-export interface ResponseType {
+export interface CommonResponseType {
   success: boolean;
-  message: string | null;
+  message?: string | null;
   [key: string]: any;
 }
 
-interface ConfigType {
-  methods: RequestMethod[];
-  handler: (
-    req: NextApiRequest,
-    res: NextApiResponse<ResponseType>
-  ) => Promise<void | NextApiResponse> | void | NextApiResponse;
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+interface HandlerType {
+  handler: NextApiHandler;
   isPrivate?: boolean;
 }
 
-export default function withHandler({
-  methods,
-  handler,
-  isPrivate = true,
-}: ConfigType) {
+type ApiMethodHandlers = {
+  [key in Uppercase<RequestMethod>]?: HandlerType;
+};
+
+export default function withHandler(handlers: ApiMethodHandlers) {
   return async function (
     req: NextApiRequest,
-    res: NextApiResponse
-  ): Promise<any> {
-    if (req.method && !methods.includes(req.method as RequestMethod)) {
-      return res.status(405).end();
-    }
-    if (isPrivate && !req.session.user) {
-      return res.status(401).json({ success: false });
-    }
+    res: NextApiResponse<CommonResponseType>
+  ) {
     try {
-      await handler(req, res);
+      const method = req.method
+        ? (req.method.toUpperCase() as keyof ApiMethodHandlers)
+        : undefined;
+
+      if (!method) {
+        throw new createHttpError.MethodNotAllowed(
+          `No method specified on path ${req.url}!`
+        );
+      }
+
+      const methodHandler = handlers[method];
+      if (!methodHandler) {
+        throw new createHttpError.MethodNotAllowed(
+          `Method ${req.method} Not Allowed on path ${req.url}!`
+        );
+      }
+
+      if (methodHandler.isPrivate && !req.session.user) {
+        throw new createHttpError.Unauthorized(
+          `Unauthorized on path ${req.url}`
+        );
+      }
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ success: false, message: error });
+      globalErrorHandler(error, res);
     }
   };
 }

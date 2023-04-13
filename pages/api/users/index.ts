@@ -5,8 +5,8 @@ import withHandler, { CommonResponseType } from 'libs/server/withHandler';
 
 interface CreateUserRequest extends NextApiRequest {
   body: {
-    email: string;
-    name: string;
+    email?: string;
+    name?: string;
   };
 }
 

@@ -3,10 +3,10 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import globalErrorHandler from './globalErrorHandler';
 
-export interface CommonResponseType {
+export interface CommonResponseType<T = null> {
   success: boolean;
   message?: string | null;
-  [key: string]: any;
+  result?: T;
 }
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

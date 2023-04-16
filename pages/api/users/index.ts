@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import createHttpError from 'http-errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import client from 'libs/server/db';
@@ -12,7 +13,7 @@ interface CreateUserRequest extends NextApiRequest {
 
 async function createUser(
   req: CreateUserRequest,
-  res: NextApiResponse<CommonResponseType>
+  res: NextApiResponse<CommonResponseType<User>>
 ) {
   const { email, name } = req.body;
   if (!email || !name) {
@@ -37,10 +38,7 @@ async function createUser(
 
   return res.status(201).json({
     success: true,
-    user: {
-      email: newUser.email,
-      name: newUser.name,
-    },
+    result: newUser,
   });
 }
 
